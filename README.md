@@ -17,6 +17,6 @@ Includes:
 Clone it, slap it somewhere in your path, and chmod that shit:
 
 ```sh
-git clone https://github.com/yourname/squelch-suite.git
+git clone https://github.com/SW-philip/squelch-suite.git
 cd squelch-suite
 chmod +x bin/*
