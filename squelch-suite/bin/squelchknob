@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# 🎛️ squelchknob — A fuzzy Gum-powered front end for squelch
+
+set -euo pipefail
+
+# Make sure gum is installed
+if ! command -v gum &>/dev/null; then
+  echo "❌ Gum is required but not installed. Get it at https://github.com/charmbracelet/gum"
+  exit 1
+fi
+
+# 🔁 Main loop
+while true; do
+  choice=$(gum choose --height 10 --header "🎚️ Welcome to squelchknob — Your Internet Radio Control Panel" \
+    "🎵 Play Station" \
+    "➕ Add Station" \
+    "🗑️ Remove Station" \
+    "🎲 Shuffle" \
+    "🔁 Resume Last" \
+    "🎼 Now Playing (Art)" \
+    "📃 List All" \
+    "❌ Quit")
+
+  case "$choice" in
+    "🎵 Play Station")
+      name=$(cut -d= -f1 ~/.config/squelch/stations | gum choose --header "🎧 Select a station to play")
+      [[ -n "$name" ]] && squelch play "$name"
+      ;;
+
+    "➕ Add Station")
+      name=$(gum input --placeholder "Station name")
+      url=$(gum input --placeholder "Stream URL")
+      if [[ -n "$name" && -n "$url" ]]; then
+        squelch add "$name" "$url"
+      fi
+      ;;
+
+    "🗑️ Remove Station")
+      name=$(cut -d= -f1 ~/.config/squelch/stations | gum choose --header "❌ Remove which station?")
+      [[ -n "$name" ]] && squelch remove "$name"
+      ;;
+
+    "🎲 Shuffle")
+      squelch shuffle
+      ;;
+
+    "🔁 Resume Last")
+      squelch resume
+      ;;
+
+    "🎼 Now Playing (Art)")
+      squelch art
+      ;;
+
+    "📃 List All")
+      gum style --foreground 212 --border normal --padding "1 2" "$(squelch list)"
+      gum confirm "Back to menu?" && continue
+      ;;
+
+    "❌ Quit")
+      echo "👋 Bye for now."
+      exit 0
+      ;;
+
+    *)
+      echo "🤷 Unrecognized option."
+      ;;
+  esac
+done

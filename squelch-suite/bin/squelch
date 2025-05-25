@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+# 🔊 squelch.sh — Internet Radio in the Shell
+# Your command-line tuner, with taste.
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+CONFIG_DIR="$HOME/.config/squelch"
+STATION_FILE="$CONFIG_DIR/stations"
+LAST_PLAYED="$CONFIG_DIR/last"
+mkdir -p "$CONFIG_DIR"
+touch "$STATION_FILE" "$LAST_PLAYED"
+
+# 🎨 Color styling
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+CYAN=$(tput setaf 6)
+BOLD=$(tput bold)
+RESET=$(tput sgr0)
+
+log() {
+  echo "${CYAN}📡 $*${RESET}"
+}
+
+error() {
+  echo "${YELLOW}❌ $*${RESET}" >&2
+}
+
+list_stations() {
+  if [[ ! -s "$STATION_FILE" ]]; then
+    log "No stations saved yet."
+    return
+  fi
+  nl -w2 -s'. ' "$STATION_FILE"
+}
+
+add_station() {
+  local name="$1"
+  local url="$2"
+  sed -i "/^$name=/d" "$STATION_FILE" 2>/dev/null || true
+  echo "$name=$url" >> "$STATION_FILE"
+  log "Added: ${BOLD}$name${RESET}"
+}
+
+remove_station() {
+  local name="$1"
+  if ! grep -q "^$name=" "$STATION_FILE"; then
+    error "No such station: $name"
+    return 1
+  fi
+  sed -i "/^$name=/d" "$STATION_FILE"
+  log "Removed: $name"
+}
+
+play_station() {
+  local name="$1"
+  local url
+  url=$(grep "^$name=" "$STATION_FILE" | cut -d= -f2-)
+  [[ -z "$url" ]] && error "Station not found: $name" && return 1
+  echo "$name" > "$LAST_PLAYED"
+  log "Now playing: ${BOLD}$name${RESET}"
+  mpv --no-input-default-bindings --input-ipc-server=/tmp/mpvsocket "$url"
+}
+
+resume_station() {
+  [[ ! -s "$LAST_PLAYED" ]] && error "Nothing to resume." && return 1
+  play_station "$(cat "$LAST_PLAYED")"
+}
+
+search_station() {
+  grep -i "$1" "$STATION_FILE" || log "No matches."
+}
+
+shuffle_station() {
+  local name
+  name=$(shuf -n 1 "$STATION_FILE" | cut -d= -f1)
+  log "Random pick: $name"
+  play_station "$name"
+}
+
+menu_station() {
+  [[ ! -s "$STATION_FILE" ]] && error "No stations saved." && return 1
+  if ! command -v fzf &>/dev/null; then
+    error "fzf required for interactive menu."
+    return 1
+  fi
+  local name
+  name=$(cut -d= -f1 "$STATION_FILE" | fzf --prompt="🎚️ Choose a station: " --border --height=40% --preview-window=down:wrap)
+  [[ -n "$name" ]] && play_station "$name"
+}
+
+show_help() {
+  cat <<EOF
+${BOLD}${CYAN}SQUELCH: Terminal Internet Radio${RESET}
+
+Usage:
+  ${BOLD}squelch add <name> <url>${RESET}      Add a new station
+  ${BOLD}squelch remove <name>${RESET}         Remove a station
+  ${BOLD}squelch list${RESET}                  List all saved stations
+  ${BOLD}squelch play <name>${RESET}           Play a station
+  ${BOLD}squelch resume${RESET}                Resume last played
+  ${BOLD}squelch search <term>${RESET}         Search stations
+  ${BOLD}squelch shuffle${RESET}               Play a random station
+  ${BOLD}squelch menu${RESET}                  Interactive fuzzy picker
+  ${BOLD}squelch help${RESET}                  Show this message
+EOF
+}
+
+# 🧭 Command routing
+cmd="${1:-menu}"
+shift || true
+
+case "$cmd" in
+  add) add_station "$@" ;;
+  remove) remove_station "$@" ;;
+  list) list_stations ;;
+  play) play_station "$@" ;;
+  resume) resume_station ;;
+  search) search_station "$@" ;;
+  shuffle) shuffle_station ;;
+  menu) menu_station ;;
+  help|-h|--help) show_help ;;
+  *) error "Unknown command: $cmd" && show_help ;;
+esac
+
