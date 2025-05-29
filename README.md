@@ -1,62 +1,106 @@
-# sqlch-suite
+# 🐿️ sqlch-ste
 
-> “Sometimes you just want to tune into a station without a UI trying to sell you vitamins.”
-
-**sqlch-suite** is a small, intentionally simple collection of tools for tuning in to internet radio from the command line, system tray, or terminal interface.  
-It’s meant to feel like an old stereo: knobs, toggles, and just enough feedback to know you’re not hallucinating.
-
-No ads. No AI. No cloud. No promises.
+> A terminal radio rebellion.  
+> Anti-Spotify. Post-stream. Totally squealed.
 
 ---
 
-## What’s Inside
+## What is sqlch-ste?
 
-- `sqlch` – A little shell script that tells `mpv` to play something.
-- `sqlchctl` – Ask it what’s playing. Or tell it to stop.
-- `sqlchtray.py` – GTK-based system tray thing with a squirrel icon and volume control.
-- `sqlchtray-launcher` – Fires up the tray script (if you’re into that).
-- `sqlchknob` – Terminal UI tuner that looks like it fell off a truck in 1998.
+**`sqlch-ste`** is a handcrafted suite of tools that resurrects internet radio for the command line.  
+It doesn't "recommend." It doesn't "curate."  
+It just *tunes in*.
 
----
-
-## Setup
-
-```bash
-git clone https://github.com/SW-philip/sqlch-suite.git
-cd sqlch-suite
-chmod +x sqlch sqlchctl sqlchknob sqlchtray-launcher
-```
-
-Enable the tray to run in the background:
-
-```bash
-systemctl --user enable --now sqlchtray.service
-```
-
----
-
-## Notes
-
-- Your stations go in `~/.config/sqlch/stations`, like this:
-
-```
-Rainy Jazz=https://stream-url-here
-Space Noise=https://another-stream-url
-```
-
-- Your icons go in:
-```
-~/.local/share/icons/squelch_icons/
-```
+Built on `mpv`, shaped like a mixtape, and operated by squirrels.
 
 ---
 
 ## Why?
 
-Because sometimes, that’s all you need: one knob, one tune, one squirrel.
+Because **Spotify is flattening taste**.  
+Because radio is still out there—obscure jazz in Paris, vaporwave in São Paulo, evangelical metal in Kentucky.  
+And because **you deserve to discover, not be fed.**
+
+`sqlch-ste` exists to bring back the weird, the local, the live.
 
 ---
 
-## License
+## 🎛 Tools
 
-See [LICENSE](LICENSE). You’re welcome to use and remix, but don’t try to resell this. That’d be weird.
+| Tool           | Description                                |
+|----------------|--------------------------------------------|
+| `squelch`      | Meta-wrapper for everything else.          |
+| `squelchctl`   | CLI control: play, stop, status.           |
+| `squelchknob`  | Full TUI tuner. Search, browse, tag.       |
+| `sqlchtray`    | System tray app for background playback.   |
+| `squirreldoc`  | Diagnostic tool. Finds ghosts in the wires.|
+
+---
+
+## 📦 Installation (Arch Linux)
+
+```bash
+git clone https://aur.archlinux.org/sqlch.git
+cd sqlch
+makepkg -si
+````
+
+Or install from your favorite AUR helper:
+
+```bash
+yay -S sqlch
+```
+
+---
+
+## 🚀 Getting Started
+
+* Run `squelchknob` to discover and tag stations.
+* Use `squelchctl play <station>` to start playback.
+* Let `sqlchtray` chill in the background.
+* Rediscover joy.
+
+---
+
+## 🧬 Philosophy
+
+Spotify is a spreadsheet.
+Internet radio is an accident.
+And accidents are where art lives.
+
+We believe in static, mislabeling, and falling in love with a station because the DJ sneezed mid-set.
+We believe in sound as locality. As signal. As resistance.
+
+---
+
+## 🎧 Curated Starter Packs
+
+*Coming soon:*
+
+* **`sqlch-core`**: The most stable and vibey stations
+* **`sqlch-void`**: Droney, cursed transmissions
+* **`sqlch-kid`**: Safe and strange children’s programming
+
+---
+
+## 🐙 Repo
+
+This is the public code repository for the `sqlch` Arch package.
+For the movement, check out: [https://sw-philip.github.io/sqlch-ste](https://sw-philip.github.io/sqlch-ste) *(coming soon)*
+
+---
+
+## 🪪 License
+
+MIT. But if you sell this on the App Store, a squirrel will find you.
+
+---
+
+## 🫂 Credits
+
+* **Phil Repko** ([@SW-philip](https://github.com/SW-philip)) — Creator, voice of the squirrel
+* Everyone still broadcasting on random ports in 2025
+
+> sqlch-ste: Tune in. Freak out. Stay weird.
+
+```
