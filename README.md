@@ -1,22 +1,62 @@
-# 🎙️ squelch-suite
+# sqlch-suite
 
-Welcome to the soft apocalypse of internet radio. This is `squelch-suite`, a suite of terminal tools that lets you treat streaming audio like it's a cursed cassette deck from 1997.
+> “Sometimes you just want to tune into a station without a UI trying to sell you vitamins.”
 
-Includes:
+**sqlch-suite** is a small, intentionally simple collection of tools for tuning in to internet radio from the command line, system tray, or terminal interface.  
+It’s meant to feel like an old stereo: knobs, toggles, and just enough feedback to know you’re not hallucinating.
 
-- `squelch` — your CLI radio tuner. Add, play, search, and shuffle stations from the safety of your terminal.
-- `squelchctl` — the remote control. Change stations, pause streams, and load URLs from a different shell without killing the vibe.
-- `squelchknob` — the front panel. A fuzzy, interactive UI to twist the dial and channel your inner shortwave shaman.
-
-> Built in Bash, with dreams of Python. Gum for garnish. Album art from the void.
+No ads. No AI. No cloud. No promises.
 
 ---
 
-## 📦 Install
+## What’s Inside
 
-Clone it, slap it somewhere in your path, and chmod that shit:
+- `sqlch` – A little shell script that tells `mpv` to play something.
+- `sqlchctl` – Ask it what’s playing. Or tell it to stop.
+- `sqlchtray.py` – GTK-based system tray thing with a squirrel icon and volume control.
+- `sqlchtray-launcher` – Fires up the tray script (if you’re into that).
+- `sqlchknob` – Terminal UI tuner that looks like it fell off a truck in 1998.
 
-```sh
-git clone https://github.com/SW-philip/squelch-suite.git
-cd squelch-suite
-chmod +x bin/*
+---
+
+## Setup
+
+```bash
+git clone https://github.com/YOURNAME/sqlch-suite.git
+cd sqlch-suite
+chmod +x sqlch sqlchctl sqlchknob sqlchtray-launcher
+```
+
+Enable the tray to run in the background:
+
+```bash
+systemctl --user enable --now sqlchtray.service
+```
+
+---
+
+## Notes
+
+- Your stations go in `~/.config/sqlch/stations`, like this:
+
+```
+Rainy Jazz=https://stream-url-here
+Space Noise=https://another-stream-url
+```
+
+- Your icons go in:
+```
+~/.local/share/icons/squelch_icons/
+```
+
+---
+
+## Why?
+
+Because sometimes, that’s all you need: one knob, one tune, one squirrel.
+
+---
+
+## License
+
+See [LICENSE](LICENSE). You’re welcome to use and remix, but don’t try to resell this. That’d be weird.
