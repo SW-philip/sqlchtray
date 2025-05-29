@@ -22,7 +22,7 @@ No ads. No AI. No cloud. No promises.
 ## Setup
 
 ```bash
-git clone https://github.com/YOURNAME/sqlch-suite.git
+git clone https://github.com/SW-philip/sqlch-suite.git
 cd sqlch-suite
 chmod +x sqlch sqlchctl sqlchknob sqlchtray-launcher
 ```
