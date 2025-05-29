@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+
+# 🎛 sqlchknob — Interactive tuner
+
+set -euo pipefail
+IFS=$'\n\t'
+
+CONFIG_DIR="$HOME/.config/sqlch"
+STATION_FILE="$CONFIG_DIR/stations"
+LAST_PLAYED="$CONFIG_DIR/last"
+DEFAULT_STATION="$CONFIG_DIR/default"
+SOCKET="/tmp/mpvsocket"
+
+mkdir -p "$CONFIG_DIR"
+touch "$STATION_FILE" "$LAST_PLAYED"
+
+ensure_gum() {
+  if ! command -v gum >/dev/null; then
+    echo "❌ 'gum' required but not found in PATH."
+    exit 1
+  fi
+}
+
+splash() {
+  gum style --foreground 2 --border double --padding "1 2" --margin "1 1" <<EOF
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+▓▓   sqlchKNOB v3   ▓▓
+▓▓────────────────────▓▓
+▓▓   • Tune In        ▓▓
+▓▓   • Drop Out       ▓▓
+▓▓   • Mono Loud      ▓▓
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+EOF
+}
+
+choose_play() {
+  local choices name
+  choices=$(cut -d= -f1 "$STATION_FILE")
+  [[ -z "$choices" ]] && echo "⚠️ No stations available." && return
+  name=$(echo "$choices" | gum choose)
+  [[ -n "$name" ]] && sqlchctl play "$name"
+}
+
+search_add() {
+  local query
+  query=$(gum input --placeholder "Search RadioBrowser")
+  [[ -z "$query" ]] && return
+
+  local fetched
+  fetched=$(curl -s "https://de1.api.radio-browser.info/json/stations/search?name=$query" | jq -r '.[] | "\(.name)=\(.url_resolved)"')
+  if [[ -z "$fetched" ]]; then
+    gum style --foreground 1 --border double "❌ No results found for '$query'"
+    return
+  fi
+
+  local results
+  results=$(echo "$fetched" | gum choose --no-limit)
+  [[ -z "$results" ]] && return
+
+  # Ensure the stations file exists
+  mkdir -p "$(dirname "$STATION_FILE")"
+  touch "$STATION_FILE"
+
+  # Normalize and save to stations file
+  echo "$results" | tr -d '\r' | while IFS= read -r line; do
+    [[ -n "$line" ]] && grep -qxF "$line" "$STATION_FILE" || echo "$line" >> "$STATION_FILE"
+  done
+
+  gum style --foreground 3 "✅ Saved new station(s) to $STATION_FILE"
+  echo "DEBUG: Writing to $STATION_FILE" >&2
+  ls -l "$STATION_FILE" >&2
+}
+
+browse_genre() {
+  local genre
+  genre=$(curl -s https://de1.api.radio-browser.info/json/genres | jq -r '.[].name' | gum choose --placeholder "Pick a genre")
+  [[ -z "$genre" ]] && return
+
+  local fetched
+  fetched=$(curl -s "https://de1.api.radio-browser.info/json/stations/bytag/$genre" | jq -r '.[] | "\(.name)=\(.url_resolved)"')
+  if [[ -z "$fetched" ]]; then
+    gum style --foreground 1 --border double "❌ No stations found for '$genre'"
+    return
+  fi
+
+  local results
+  results=$(echo "$fetched" | tr '\r' '
+' | gum choose --no-limit)
+
+  if [[ -z "$results" ]]; then
+    return
+  fi
+
+  while IFS= read -r line; do
+    [[ -n "$line" ]] && grep -qxF "$line" "$STATION_FILE" || echo "$line" >> "$STATION_FILE"
+  done <<< "$results"
+}
+
+edit_station() {
+  local tmpfile backup
+  tmpfile=$(mktemp)
+  backup="${STATION_FILE}.bak.$(date +%s)"
+  cp "$STATION_FILE" "$backup"
+  cp "$STATION_FILE" "$tmpfile"
+  gum write --placeholder "Edit your stations..." < "$tmpfile" > "$tmpfile" && mv "$tmpfile" "$STATION_FILE"
+}
+
+delete_station() {
+  local name
+  name=$(cut -d= -f1 "$STATION_FILE" | gum choose --placeholder "Select station to delete")
+  [[ -n "$name" ]] && sed -i "/^\*\?$name=/d" "$STATION_FILE"
+}
+
+show_status() {
+  sqlchctl status
+  sleep 2
+}
+
+stop_playback() {
+  sqlchctl stop
+}
+
+main_menu() {
+  splash
+  local choice
+  choice=$(gum choose "🎧 Play Station" "🔍 Search & Add" "🎚 Browse by Genre" "✏️ Edit Station" "🗑 Delete Station" "ℹ️ Now Playing" "⛔ Stop" "🚪 Quit")
+  case "$choice" in
+    "🎧 Play Station") choose_play ;;
+    "🔍 Search & Add") search_add ;;
+    "🎚 Browse by Genre") browse_genre ;;
+    "✏️ Edit Station") edit_station ;;
+    "🗑 Delete Station") delete_station ;;
+    "ℹ️ Now Playing") show_status ;;
+    "⛔ Stop") stop_playback ;;
+    "🚪 Quit") exit 0 ;;
+  esac
+}
+
+ensure_gum
+while true; do main_menu; done
