@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# 🔊 sqlch — Terminal Internet Radio Player
+
+set -euo pipefail
+CONFIG_DIR="$HOME/.config/sqlch"
+STATIONS="$CONFIG_DIR/stations"
+LAST="$CONFIG_DIR/last"
+mkdir -p "$CONFIG_DIR"
+touch "$STATIONS" "$LAST"
+
+mpv_opts=(--no-terminal --no-video --input-ipc-server=/tmp/mpvsocket)
+
+play() {
+  local name="$1"
+  local url
+  url=$(grep "^$name=" "$STATIONS" | cut -d= -f2- || true)
+  [[ -z "$url" ]] && { echo "❌ Station not found"; exit 1; }
+  echo "$name" > "$LAST"
+  echo "🎧 Playing $name"
+  exec mpv "${mpv_opts[@]}" "$url"
+}
+
+resume() {
+  [[ ! -s "$LAST" ]] && { echo "⚠️ No previous station."; exit 1; }
+  play "$(cat "$LAST")"
+}
+
+case "${1:-}" in
+  play) shift; play "$1" ;;
+  resume) resume ;;
+  *) echo "Usage: sqlch [play <name> | resume]" ;;
+esac
