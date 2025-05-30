@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+# 🎛 squelchknob — Interactive tuner (patched with delete/edit/search/add)
+
+set -euo pipefail
+IFS=$'\n\t'
+
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/sqlch"
+STATION_FILE="$CONFIG_DIR/stations"
+LAST_PLAYED="$CONFIG_DIR/last"
+DEFAULT_STATION="$CONFIG_DIR/default"
+SOCKET="/tmp/mpvsocket"
+
+mkdir -p "$CONFIG_DIR"
+touch "$STATION_FILE" "$LAST_PLAYED"
+
+ensure_gum() {
+  if ! command -v gum >/dev/null; then
+    echo "❌ 'gum' required but not found in PATH."
+    exit 1
+  fi
+}
+
+splash() {
+  gum style --foreground 2 --border double --padding "1 2" --margin "1 1" <<EOF
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+▓▓   SQUELCHKNOB v3   ▓▓
+▓▓────────────────────▓▓
+▓▓   • Tune In        ▓▓
+▓▓   • Edit/Manage    ▓▓
+▓▓   • Live Search    ▓▓
+▓▓   • Stay Loud      ▓▓
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+EOF
+}
+
+choose_play() {
+  local station
+  station=$(cut -d '=' -f 1 "$STATION_FILE" | gum choose --no-limit --height=10 --header="Pick a station to play") || return
+  [[ -n "$station" ]] && squelchctl play "$station"
+}
+
+delete_station() {
+  local target
+  target=$(cut -d '=' -f 1 "$STATION_FILE" | gum choose --header="🗑 Select a station to delete") || return
+  gum confirm "Delete '$target'?" || return
+  grep -v "^$target=" "$STATION_FILE" > "$STATION_FILE.tmp" && mv "$STATION_FILE.tmp" "$STATION_FILE"
+  gum style --foreground 1 "❌ Deleted: $target"
+}
+
+edit_station() {
+  local selected old_url new_name new_url
+  selected=$(cut -d '=' -f 1 "$STATION_FILE" | gum choose --header="✏ Edit a station") || return
+  old_url=$(grep "^$selected=" "$STATION_FILE" | cut -d '=' -f2-)
+  new_name=$(gum input --placeholder "$selected" --prompt "New name:") || return
+  new_url=$(gum input --placeholder "$old_url" --prompt "New URL:") || return
+  grep -v "^$selected=" "$STATION_FILE" > "$STATION_FILE.tmp"
+  echo "$new_name=$new_url" >> "$STATION_FILE.tmp"
+  mv "$STATION_FILE.tmp" "$STATION_FILE"
+  gum style --foreground 2 "✅ Updated: $new_name"
+}
+
+add_station() {
+  local name url
+  name=$(gum input --placeholder "Station Name") || return
+  url=$(gum input --placeholder "https://...stream...") || return
+  echo "$name=$url" >> "$STATION_FILE"
+  gum style --foreground 2 "✅ Added: $name"
+}
+
+search_radiobrowser() {
+  local query results name url pick
+  query=$(gum input --prompt="🔍 Search RadioBrowser:") || return
+  results=$(curl -s "https://de1.api.radio-browser.info/json/stations/search?name=$query" | jq -r '.[] | "\(.name)=\(.url_resolved)"') || true
+  if [[ -z "$results" ]]; then
+    gum style --foreground 1 "⚠ No stations found"
+    return
+  fi
+  pick=$(echo "$results" | gum choose --header="Select a station to add") || return
+  name="${pick%%=*}"
+  url="${pick#*=}"
+  echo "$name=$url" >> "$STATION_FILE"
+  gum style --foreground 2 "✅ Added: $name"
+}
+
+main_menu() {
+  while true; do
+    splash
+    case $(gum choose "🎧 Tune In" "➕ Add Station" "✏ Edit Station" "🗑 Delete Station" "🔍 Search RadioBrowser" "❌ Exit") in
+      "🎧 Tune In") choose_play ;;
+      "➕ Add Station") add_station ;;
+      "✏ Edit Station") edit_station ;;
+      "🗑 Delete Station") delete_station ;;
+      "🔍 Search RadioBrowser") search_radiobrowser ;;
+      *) exit ;;
+    esac
+  done
+}
+
+ensure_gum
+main_menu

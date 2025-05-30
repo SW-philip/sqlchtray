@@ -1,0 +1,15 @@
+[Unit]
+Description=SQLCH Tray Icon
+After=graphical-session.target
+Requires=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/prepko/.local/bin/sqlchtray.py
+Restart=on-failure
+Environment=XDG_RUNTIME_DIR=%t
+Environment=DISPLAY=:0
+Environment=XDG_CURRENT_DESKTOP=KDE
+
+[Install]
+WantedBy=default.target
