@@ -30,6 +30,6 @@ package() {
   install -Dm755 sqlchknob "$pkgdir/usr/bin/sqlchknob"
   install -Dm755 sqlchtray.py "$pkgdir/usr/bin/sqlchtray"
   install -Dm644 sqlchtray.service "$pkgdir/usr/lib/systemd/user/sqlchtray.service"
-  install -Dm644 sqlchtray-icon.png "$pkgdir/usr/share/icons/hicolor/64x64/apps/sqlchtray-icon.png"
+  install -Dm644 sqlchtray-icon.png "$pkgdir/usr/share/icons/hicolor/64x64/apps/sqrrlch_icon.png"
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
