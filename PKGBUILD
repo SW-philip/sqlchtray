@@ -2,7 +2,7 @@
 
 pkgname=sqlch-suite
 pkgver=3.4.1
-pkgrel=1
+pkgrel=2
 pkgdesc="A modular internet radio CLI+GUI suite featuring a tray icon, TUI, and mpv controller"
 arch=('any')
 url="https://github.com/SW-philip/sqlch-suite"
