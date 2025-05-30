@@ -1,106 +1,100 @@
-# 🐿️ sqlch-ste
+# 🎛️ sqlchtray 🐿️
 
-> A terminal radio rebellion.  
-> Anti-Spotify. Post-stream. Totally squealed.
+> The entire reason the suite existed. The suite is dead. Long live the tray.
 
----
-
-## What is sqlch-ste?
-
-**`sqlch-ste`** is a handcrafted suite of tools that resurrects internet radio for the command line.  
-It doesn't "recommend." It doesn't "curate."  
-It just *tunes in*.
-
-Built on `mpv`, shaped like a mixtape, and operated by squirrels.
+**sqlchtray** is a minimalist, modular GTK+ tray app for controlling your personal internet radio system—powered by `mpv`, styled like a dusty '90s hi-fi, and completely terminal-optional. It replaces all previous `sqlch-*` commands. It is the whole thing now.
 
 ---
 
-## Why?
+## ✨ Features
 
-Because **Spotify is flattening taste**.  
-Because radio is still out there—obscure jazz in Paris, vaporwave in São Paulo, evangelical metal in Kentucky.  
-And because **you deserve to discover, not be fed.**
-
-`sqlch-ste` exists to bring back the weird, the local, the live.
-
----
-
-## 🎛 Tools
-
-| Tool           | Description                                |
-|----------------|--------------------------------------------|
-| `squelch`      | Meta-wrapper for everything else.          |
-| `squelchctl`   | CLI control: play, stop, status.           |
-| `squelchknob`  | Full TUI tuner. Search, browse, tag.       |
-| `sqlchtray`    | System tray app for background playback.   |
-| `squirreldoc`  | Diagnostic tool. Finds ghosts in the wires.|
+- 🎧 Browse and play saved internet radio stations
+- 🔃 Instant refresh when stations are edited
+- 📉 Volume control via tray
+- 🧼 Self-restarting "Reboot Tray" function (like a snake eating itself, but cute)
+- 🎛 Launches full TUI (`sqlchknob`) when you want knobs instead of clicks
+- 📜 Show logs without remembering journalctl flags
+- 🐢 Looks deceptively calm, like it's not held together by 18 threads and a shell script
 
 ---
 
-## 📦 Installation (Arch Linux)
+## 📦 Installation
+
+When on the AUR:
 
 ```bash
-git clone https://aur.archlinux.org/sqlch.git
-cd sqlch
+yay -S sqlchtray
+```
+
+Or install from source:
+
+```bash
+git clone https://github.com/SW-philip/sqlchtray.git
+cd sqlchtray
 makepkg -si
-````
+```
 
-Or install from your favorite AUR helper:
+You’ll get:
+- `/usr/bin/sqlchtray` — the daemonized tray icon
+- `sqlchtray.service` — a systemd user unit
+- `/usr/share/icons/hicolor/...` — a pixel-perfect icon you’ll grow unreasonably attached to
+
+---
+
+## 🛠 Configuration
+
+Your stations live here:
+
+```
+~/.config/sqlch/stations
+```
+
+Format:
+
+```ini
+Cool Jazz=https://some.stream.url
+Vapor Train=https://another.one
+```
+
+They’ll auto-refresh, or hit 🔃 Refresh in the tray.
+
+---
+
+## 🖥️ Autostart
+
+If you want the tray running at login:
 
 ```bash
-yay -S sqlch
+systemctl --user enable --now sqlchtray.service
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🧪 Debugging
 
-* Run `squelchknob` to discover and tag stations.
-* Use `squelchctl play <station>` to start playback.
-* Let `sqlchtray` chill in the background.
-* Rediscover joy.
-
----
-
-## 🧬 Philosophy
-
-Spotify is a spreadsheet.
-Internet radio is an accident.
-And accidents are where art lives.
-
-We believe in static, mislabeling, and falling in love with a station because the DJ sneezed mid-set.
-We believe in sound as locality. As signal. As resistance.
-
----
-
-## 🎧 Curated Starter Packs
-
-*Coming soon:*
-
-* **`sqlch-core`**: The most stable and vibey stations
-* **`sqlch-void`**: Droney, cursed transmissions
-* **`sqlch-kid`**: Safe and strange children’s programming
-
----
-
-## 🐙 Repo
-
-This is the public code repository for the `sqlch` Arch package.
-For the movement, check out: [https://sw-philip.github.io/sqlch-ste](https://sw-philip.github.io/sqlch-ste) *(coming soon)*
-
----
-
-## 🪪 License
-
-MIT. But if you sell this on the App Store, a squirrel will find you.
-
----
-
-## 🫂 Credits
-
-* **Phil Repko** ([@SW-philip](https://github.com/SW-philip)) — Creator, voice of the squirrel
-* Everyone still broadcasting on random ports in 2025
-
-> sqlch-ste: Tune in. Freak out. Stay weird.
-
+```bash
+sqlchtray --debug
 ```
+
+Logs are clean. Error messages are sassy but polite.
+
+---
+
+## 🪦 Former utilities
+
+- `sqlch` — was just a wrapper
+- `sqlchctl` — absorbed into the tray
+- `sqlchknob` — lives on as a TUI, launched from tray
+- The rest — gone like tears in rain
+
+---
+
+## 🤝 Contributing
+
+Pull requests, weird bugs, unsolicited praise—[open an issue](https://github.com/SW-philip/sqlchtray/issues). If you’re adding features, please make sure they fit the "small, useful, funny" vibe.
+
+---
+
+## 🧾 License
+
+MIT. You can use the tray for whatever, even chaos. Just don’t sell it to a hedge fund.
