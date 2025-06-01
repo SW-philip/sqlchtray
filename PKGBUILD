@@ -7,7 +7,7 @@ pkgdesc="A modular internet radio CLI+GUI suite featuring a tray icon, TUI, and 
 arch=('any')
 url="https://github.com/SW-philip/sqlch-suite"
 license=('MIT')
-depends=('python' 'python-gobject' 'gtk3' 'libappindicator-gtk3' 'bash' 'hicolor-icon-theme' 'glib2')
+depends=('python' 'python-gobject' 'gtk3' 'libayatana-appindicator' 'bash' 'hicolor-icon-theme' 'glib2')
 optdepends=('mpv: used by sqlchctl for playback')
 source=('sqlch'
         'sqlchctl'
