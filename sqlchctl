@@ -47,7 +47,7 @@ play() {
     sleep 0.5
   fi
 
-  echo "$name" > "$LAST_PLAYED"
+  echo "AUDIO:$name" > "$LAST_PLAYED"
   notify-send "🎶 Now Playing" "$name"
   echo "[DEBUG] Playing station: $url" >&2
 
@@ -81,7 +81,18 @@ play_channel() {
     echo "❌ Could not resolve: $input" >&2
     exit 1
   fi
+    if [[ -S "$SOCKET" ]]; then
+    echo "quit" | socat - "$SOCKET" 2>/dev/null || true
+    rm -f "$SOCKET"
+    sleep 0.5
+  fi
 
+  echo "VIDEO:$name" > "$LAST_PLAYED"
+  notify-send "📺 Now Playing (Video)" "$name"
+  echo "[DEBUG] Playing channel: $url" >&2
+
+  mpv --input-ipc-server="$SOCKET" --ao=pulse "$url" > /dev/null 2>&1 &
+}
 
 stop() {
   if [[ -S "$SOCKET" ]]; then

@@ -99,10 +99,6 @@ class sqlchTray:
 
         self.populate_stations()
 
-        header2 = Gtk.MenuItem(label="📺 Channels:")
-        header2.set_sensitive(False)
-        self.menu.append(header2)
-        header2.show()
         self.add_channel_menu()
 
         self.menu.append(Gtk.SeparatorMenuItem())
@@ -120,6 +116,37 @@ class sqlchTray:
         quit_item.connect("activate", lambda _: Gtk.main_quit())
         self.menu.append(quit_item)
         quit_item.show()
+
+    def add_channel_menu(self):
+        if not os.path.exists(CHANNEL_FILE):
+            channel_menu_item = Gtk.MenuItem(label="⚠ No video channels")
+            channel_menu_item.set_sensitive(False)
+            self.menu.append(channel_menu_item)
+            channel_menu_item.show()
+            return
+
+        channel_submenu = Gtk.Menu()
+        with open(CHANNEL_FILE, "r") as f:
+            for line in f:
+                if "=" not in line:
+                    continue
+                name = line.strip().split("=", 1)[0]
+
+                def make_callback(channel_name):
+                    return lambda _: self.play_channel(channel_name)
+
+                channel_item = Gtk.MenuItem(label=f"📺 {name}")
+                channel_item.connect("activate", make_callback(name))
+                channel_submenu.append(channel_item)
+                channel_item.show()
+
+        channel_menu_item = Gtk.MenuItem(label="📺 Channels ▶")
+        channel_menu_item.set_submenu(channel_submenu)
+        self.menu.append(channel_menu_item)
+        channel_menu_item.show()
+
+    def play_channel(self, name):
+        subprocess.Popen([sqlchCTL, "play-channel", name])
 
     def add_volume_controls(self):
         volume = Gtk.MenuItem(label="🔊 Volume")
