@@ -7,6 +7,7 @@ IFS=$'\n\t'
 
 CONFIG_DIR="$HOME/.config/sqlch"
 STATION_FILE="$CONFIG_DIR/stations"
+CHANNEL_FILE="$CONFIG_DIR/channels"
 LAST_PLAYED="$CONFIG_DIR/last"
 DEFAULT_STATION="$CONFIG_DIR/default"
 SOCKET="/tmp/mpvsocket"
@@ -111,6 +112,12 @@ delete_station() {
   [[ -n "$name" ]] && sed -i "/^\*\?$name=/d" "$STATION_FILE"
 }
 
+select_channel() {
+  local selected
+  selected=$(cut -d= -f1 "$CHANNEL_FILE" | gum choose --height=20)
+  [[ -n "$selected" ]] && sqlchctl play-channel "$selected"
+}
+
 show_status() {
   sqlchctl status
   sleep 2
@@ -130,6 +137,7 @@ main_menu() {
     "🎚 Browse by Genre") browse_genre ;;
     "✏️ Edit Station") edit_station ;;
     "🗑 Delete Station") delete_station ;;
+    "📺 Channels" select_channel) select_channel ;;
     "ℹ️ Now Playing") show_status ;;
     "⛔ Stop") stop_playback ;;
     "🚪 Quit") exit 0 ;;

@@ -4,6 +4,7 @@ IFS=$'\n\t'
 
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/sqlch"
 STATION_FILE="$CONFIG_DIR/stations"
+CHANNEL_FILE="$CONFIG_DIR/channels"
 LAST_PLAYED="$CONFIG_DIR/last"
 SOCKET="/tmp/mpvsocket"
 
@@ -53,6 +54,34 @@ play() {
   mpv --no-video --input-ipc-server="$SOCKET" --ao=pulse "$url" > /dev/null 2>&1 &
 }
 
+play_channel() {
+  if [[ -z "${1:-}" ]]; then
+    echo "No channel name or URL provided." >&2
+    exit 1
+  fi
+
+  local input="$1"
+  local url name
+
+  echo "[DEBUG] Channel input received: $input" >&2
+
+  while IFS='=' read -r name url; do
+    if [[ "$name" == "$input" ]]; then
+      break
+    fi
+  done < "$CHANNEL_FILE"
+
+  if [[ -z "$url" ]]; then
+    url="$input"
+    name="$input"
+  fi
+
+  if [[ -z "$url" ]]; then
+    notify-send "sqlch Error" "Channel '$input' not found."
+    echo "❌ Could not resolve: $input" >&2
+    exit 1
+  fi
+
 
 stop() {
   if [[ -S "$SOCKET" ]]; then
@@ -76,7 +105,9 @@ status() {
 
 case "${1:-}" in
   play) play "${2:-}" ;;
+  play-channel) play_channel "${2:-}" ;;
   stop) stop ;;
+  pause) pause ;;
   status) status ;;
-  *) echo "Usage: sqlchctl {play <name>|stop|status}" ;;
+  *) echo "Usage: sqlchctl {play <name>|play-channel <name>|stop|pause|status}" ;;
 esac
