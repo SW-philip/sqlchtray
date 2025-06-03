@@ -12,7 +12,7 @@ optdepends=(
   'jq: JSON parsing for radio-browser search'
 )
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('SKIP')  # Ideally replace with real hash
+sha256sums=('9e77b0e295b7ba9b45007a739a9d91c7e8cbe18f4cb654c61538fc5d3ebc9bf6')
 
 package() {
   cd "$srcdir/$pkgname-$pkgver"
