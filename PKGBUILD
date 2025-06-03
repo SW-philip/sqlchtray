@@ -1,24 +1,30 @@
+# Maintainer: Philip J. Repko <you@example.com>
 pkgname=sqlch-suite
-pkgver=0.1.0
+pkgver=3.1
 pkgrel=1
+pkgdesc="Terminal-based internet radio suite with TUI, tray, and controller"
 arch=('any')
 url="https://github.com/SW-philip/sqlch-suite"
 license=('MIT')
-depends=('bash' 'glib2' 'gtk3' 'hicolor-icon-theme' 'libayatana-appindicator' 'python' 'python-gobject' 'mpv')
-makedepends=('git')
-source=(
-  "sqlchctl::https://raw.githubusercontent.com/SW-philip/sqlch-suite/v${pkgver}/sqlchctl"
-  "sqlchknob::https://raw.githubusercontent.com/SW-philip/sqlch-suite/v${pkgver}/sqlchknob"
-  "sqlchtray::https://raw.githubusercontent.com/SW-philip/sqlch-suite/v${pkgver}/sqlchtray"
-  "LICENSE"
-  "README.md"
+depends=('bash' 'mpv' 'gtk3' 'python' 'python-gobject' 'libayatana-appindicator' 'hicolor-icon-theme')
+optdepends=(
+  'gum: TUI interface in sqlchknob'
+  'jq: JSON parsing for radio-browser search'
 )
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP') # optional: use actual sums later
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('SKIP')  # Ideally replace with real hash
 
 package() {
-  install -Dm755 sqlchctl "$pkgdir/usr/bin/sqlchctl"
-  install -Dm755 sqlchknob "$pkgdir/usr/bin/sqlchknob"
+  cd "$srcdir/$pkgname-$pkgver"
+
+  # Install binaries
+  install -Dm755 bin/sqlchctl "$pkgdir/usr/bin/sqlchctl"
+  install -Dm755 bin/squelchknob "$pkgdir/usr/bin/squelchknob"
   install -Dm755 sqlchtray.py "$pkgdir/usr/bin/sqlchtray"
+
+  # Install icons
+  install -Dm644 assets/sqrrlch_icon.png "$pkgdir/usr/share/icons/hicolor/512x512/apps/sqlch.png"
+
+  # License
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
-  install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
 }
