@@ -1,27 +1,22 @@
 # Maintainer: Philip J. Repko <your@email.com>
 
 pkgname=sqlch-suite
-pkgver=3.4.1
-pkgrel=2
+pkgver=0.1.0
+pkgrel=1
 pkgdesc="A modular internet radio CLI+GUI suite featuring a tray icon, TUI, and mpv controller"
 arch=('any')
 url="https://github.com/SW-philip/sqlch-suite"
 license=('MIT')
 depends=('python' 'python-gobject' 'gtk3' 'libayatana-appindicator' 'bash' 'hicolor-icon-theme' 'glib2')
 optdepends=('mpv: used by sqlchctl for playback')
-source=('sqlchctl'
-        'sqlchknob'
-        'sqlchtray'
-        'sqlchtray.service'
-        'sqrrlch_icon.png'
-        'LICENSE')
-md5sums=('SKIP'
-         'SKIP'
-         'SKIP'
-         'SKIP'
-         'SKIP'
-         'SKIP'
-         'SKIP')
+makedepends=('git')
+source=(
+  "sqlchctl::https://raw.githubusercontent.com/SW-philip/sqlch-suite/v$pkgver/sqlchctl"
+  "sqlchknob::https://raw.githubusercontent.com/SW-philip/sqlch-suite/v$pkgver/sqlchknob"
+  "sqlchtray::https://raw.githubusercontent.com/SW-philip/sqlch-suite/v$pkgver/sqlchtray")
+md5sums=('e7df033a05f42d073e8ce3ede5baac2c'
+         'ae8219cbaba49c298a859673ecf41402'
+         '87a70b0c11bc530c421aca25df218c10')
 
 package() {
   install -Dm755 sqlchctl "$pkgdir/usr/bin/sqlchctl"
