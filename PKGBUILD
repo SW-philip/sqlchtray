@@ -1,6 +1,6 @@
 # Maintainer: Philip J. Repko <you@example.com>
 pkgname=sqlch-suite
-pkgve0.1.0
+pkgver=0.1.0
 pkgrel=1
 pkgdesc="Terminal-based internet radio suite with TUI, tray, and controller"
 arch=('any')
