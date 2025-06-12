@@ -1,0 +1,21 @@
+pkgbase = sqlch-suite
+	pkgdesc = A minimal analog suite for internet radio control and display (squelch, sqlchknob, sqlchtray)
+	pkgver = 1.1
+	pkgrel = 1
+	url = https://github.com/SW-philip/sqlch-suite
+	arch = any
+	license = MIT
+	makedepends = git
+	depends = mpv
+	depends = gtk3
+	depends = libappindicator-gtk3
+	depends = jq
+	depends = curl
+	depends = coreutils
+	depends = bash
+	depends = glib2
+	depends = pavucontrol
+	source = sqlch-suite-1.1.tar.gz::https://github.com/SW-philip/sqlch-suite/archive/refs/tags/v1.1.tar.gz
+	sha256sums = 649a7d09d0cf80088b58931fc678f884abe14d2f1c63787eff69e2ba46e79eff
+
+pkgname = sqlch-suite
