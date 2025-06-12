@@ -70,9 +70,9 @@ class sqlchTray:
         self.indicator = AppIndicator3.Indicator.new(
             self.app_id,
             os.path.join(
-            os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share")),
-            "icons/squelch_icons/sqrrlch_icon.png"
-        ),
+                os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share")),
+                "icons/squelch_icons/sqrrlch_icon.png",
+            ),
             AppIndicator3.IndicatorCategory.APPLICATION_STATUS,
         )
         self.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
@@ -209,8 +209,6 @@ class sqlchTray:
 
     def make_station_callback(self, name):
         return lambda _: self.play_station(name)
-                self.menu.append(item)
-                item.show()
 
     def play_station(self, name):
         subprocess.Popen([sqlchCTL, "play", name])
